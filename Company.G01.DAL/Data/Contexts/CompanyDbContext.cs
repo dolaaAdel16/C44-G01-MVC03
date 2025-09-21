@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Company.G01.DAL.Data.Contexts
 {
-    internal class CompanyDbContext : DbContext
+    public class CompanyDbContext : DbContext
     {
-        public CompanyDbContext() : base()
+        public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base()
         {
 
         }
@@ -21,7 +21,7 @@ namespace Company.G01.DAL.Data.Contexts
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server = .; DataBase = Company G01; Trusted_Connection = True; TrustServerCertificate = True");
+            optionsBuilder.UseSqlServer("Server = .; DataBase = CompanyG01; Trusted_Connection = True; TrustServerCertificate = True");
         }
 
         public DbSet<Department> Departments { get; set; }
