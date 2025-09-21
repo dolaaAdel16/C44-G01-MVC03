@@ -1,5 +1,7 @@
 ﻿using Company.G01.BLL.Interfaces;
 using Company.G01.BLL.Repositories;
+using Company.G01.DAL.Models;
+using Company.G01.PL.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Company.G01.PL.Controllers
@@ -18,9 +20,37 @@ namespace Company.G01.PL.Controllers
         [HttpGet] //GET: /Department/Index
         public IActionResult Index()
         {
-             var departments = _departmentRepository.GetAll();    
+            var departments = _departmentRepository.GetAll();
 
             return View(departments);
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        { 
+            return View();
+        }
+
+        [HttpPost]
+
+        public IActionResult Create(CreateDepartmentDTO model )
+        {
+           if(ModelState.IsValid) // Server Side Validation 
+           {
+                var department = new Department()
+                {
+                    Code = model.Code ,
+                    Name = model.Name ,
+                    CreateAt = model.CreateAt
+                };
+                var count = _departmentRepository.Add(department);
+                if(count > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+           }
+
+            return View(model);
         }
     }
 }
