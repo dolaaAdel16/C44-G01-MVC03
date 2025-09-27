@@ -108,7 +108,6 @@ namespace Company.G01.PL.Controllers
                     {
                         return RedirectToAction(nameof(Index));
                     }
-                }
 
             }
 
