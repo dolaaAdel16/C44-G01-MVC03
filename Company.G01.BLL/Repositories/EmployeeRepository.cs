@@ -14,7 +14,6 @@ namespace Company.G01.BLL.Repositories
         public EmployeeRepository(CompanyDbContext context) : base(context)
         {
 
-        }
 
     }
 }
