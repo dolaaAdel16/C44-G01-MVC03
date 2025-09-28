@@ -8,17 +8,34 @@ namespace Company.G01.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository _employeerepository;
+        private readonly IDepartmentRepository _departmentRepository;
 
         // ASK CLR Create object form DepartmentRepository
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository , IDepartmentRepository departmentRepository)
         {
             _employeerepository = employeeRepository;
+           _departmentRepository = departmentRepository;
         }
 
         [HttpGet] //GET: /Employee/Index
-        public IActionResult Index()
+        public IActionResult Index(string? SearchInput)
         {
-            var employees = _employeerepository.GetAll();
+            IEnumerable<Employee> employees;
+            if (string.IsNullOrEmpty(SearchInput))
+            {
+                 employees = _employeerepository.GetAll();
+            }
+            else
+            {
+                 employees = _employeerepository.GetByName(SearchInput);
+            }
+            
+            // Dictionary : Key , Value
+            // 1.ViewData : Transfer Extra info from Controller (Action) to view
+            //ViewData["Message"] = "Hello from ViewData";
+
+            // 2.ViewBag  : Transfer Extra info from Controller (Action) to view
+            //ViewBag.Message = "Hello from ViewBag";
 
             return View(employees);
         }
@@ -26,7 +43,10 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var departments =  _departmentRepository.GetAll();
+            ViewData["Departments"] = departments;
+
+            return View(departments);
         }
 
         [HttpPost]
@@ -51,6 +71,7 @@ namespace Company.G01.PL.Controllers
                 var count = _employeerepository.Add(employee);
                 if (count > 0)
                 {
+                    TempData["Message"] = "Employee Created Successfully";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -73,24 +94,15 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
+            var departments = _departmentRepository.GetAll();
+            ViewData["Departments"] = departments;
             if (id is null) return BadRequest("Invalid Id "); // 400
 
             var employee = _employeerepository.Get(id.Value);
             if (employee is null) return NotFound(new { StatusCode = 404, message = $"Department with id :{id}  is not found" });
-            var employeeDto = new CreateEmployeeDTO()
-            {
-                Name = employee.Name,
-                Email = employee.Email,
-                Address = employee.Address,
-                Phone = employee.Phone,
-                Salary = employee.Salary,
-                HiringDate = employee.HiringDate,
-                CreateAt = employee.CreateAt,
-                Age = employee.Age,
-                IsActive = employee.IsActive,
-                IsDeleted = employee.IsDeleted
-            };
-            return View(employeeDto);
+         
+        
+            return View(employee);
         }
 
         [HttpPost]
