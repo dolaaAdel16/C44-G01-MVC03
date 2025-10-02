@@ -9,7 +9,7 @@ namespace Company.G01.PL.Mapping
     {
         public EmployeeProfile ()
         {
-            CreateMap<CreateEmployeeDTO, Employee>().ForMember(d => d.Name, o => o.MapFrom(s => $"{s.Name} Hello"));
+            CreateMap<CreateEmployeeDTO, Employee>().ForMember(d => d.Name, o => o.MapFrom(s => $"{s.Name} "));
             CreateMap<Employee , CreateEmployeeDTO>();
         }
     }
