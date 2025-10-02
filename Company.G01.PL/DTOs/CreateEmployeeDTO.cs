@@ -31,5 +31,7 @@ namespace Company.G01.PL.DTOs
         public int? Age { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
+
+        public int? DepartmentId { get; set; }
     }
 }
