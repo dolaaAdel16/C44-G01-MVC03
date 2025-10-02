@@ -54,6 +54,5 @@ namespace Company.G01.BLL.Repositories
             return _context.SaveChanges();
         }
 
-      
     }
 }
