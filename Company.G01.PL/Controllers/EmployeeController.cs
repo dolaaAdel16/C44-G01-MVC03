@@ -8,19 +8,23 @@ namespace Company.G01.PL.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepository _employeerepository;
-        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IUnitOfWork _unitOfWork;
+
+        //private readonly IEmployeeRepository _employeerepository;
+        //private readonly IDepartmentRepository _departmentRepository;
         private readonly IMapper _mapper;
 
         // ASK CLR Create object form DepartmentRepository
         public EmployeeController(
-            IEmployeeRepository employeeRepository ,
-            IDepartmentRepository departmentRepository,
+            //IEmployeeRepository employeeRepository ,
+            //IDepartmentRepository departmentRepository,
+            IUnitOfWork unitOfWork,
             IMapper mapper
             )
         {
-            _employeerepository = employeeRepository;
-           _departmentRepository = departmentRepository;
+            _unitOfWork = unitOfWork;
+            // _employeerepository = employeeRepository;
+            //_departmentRepository = departmentRepository;
             _mapper = mapper;
         }
 
@@ -30,11 +34,11 @@ namespace Company.G01.PL.Controllers
             IEnumerable<Employee> employees;
             if (string.IsNullOrEmpty(SearchInput))
             {
-                 employees = _employeerepository.GetAll();
+                 employees = _unitOfWork.EmployeeRepository.GetAll();
             }
             else
             {
-                 employees = _employeerepository.GetByName(SearchInput);
+                 employees = _unitOfWork.EmployeeRepository.GetByName(SearchInput);
             }
             
             // Dictionary : Key , Value
@@ -50,7 +54,7 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var departments =  _departmentRepository.GetAll();
+            var departments = _unitOfWork.DepartmentRepository.GetAll();
             ViewData["Departments"] = departments;
 
             return View(departments);
@@ -80,7 +84,10 @@ namespace Company.G01.PL.Controllers
                     //};
 
                     var employee = _mapper.Map<Employee>(model);
-                    var count = _employeerepository.Add(employee);
+                    _unitOfWork.EmployeeRepository.Add(employee);
+                    //_unitOfWork.EmployeeRepository.Update(employee);
+                    //_unitOfWork.EmployeeRepository.Delete(employee);
+                    var count = _unitOfWork.Complete();
                     if (count > 0)
                     {
                         TempData["Message"] = "Employee Created Successfully";
@@ -102,7 +109,7 @@ namespace Company.G01.PL.Controllers
         {
             if (id is null) return BadRequest("Invalid Id "); // 400
 
-            var employee = _employeerepository.Get(id.Value);
+            var employee = _unitOfWork.EmployeeRepository.Get(id.Value);
             if (employee is null) return NotFound(new { StatusCode = 404, message = $"Employee with id :{id}  is not found" });
 
             return View(employee);
@@ -111,11 +118,11 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            var departments = _departmentRepository.GetAll();
+            var departments = _unitOfWork.DepartmentRepository.GetAll();
             ViewData["Departments"] = departments;
             if (id is null) return BadRequest("Invalid Id "); // 400
 
-            var employee = _employeerepository.Get(id.Value);
+            var employee = _unitOfWork.EmployeeRepository.Get(id.Value);
             if (employee is null) return NotFound(new { StatusCode = 404, message = $"Department with id :{id}  is not found" });
 
             var dto = _mapper.Map<CreateEmployeeDTO>(employee);
@@ -146,8 +153,9 @@ namespace Company.G01.PL.Controllers
                     IsDeleted = model.IsDeleted
                 };
 
-                var count = _employeerepository.Update(employee);
-                    if (count > 0)
+                _unitOfWork.EmployeeRepository.Update(employee);
+                var count = _unitOfWork.Complete();
+                if (count > 0)
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -179,7 +187,8 @@ namespace Company.G01.PL.Controllers
 
 
 
-                var count = _employeerepository.Delete(employee);
+                _unitOfWork.EmployeeRepository.Delete(employee);
+                var count = _unitOfWork.Complete();
                 if (count > 0)
                 {
                     return RedirectToAction(nameof(Index));

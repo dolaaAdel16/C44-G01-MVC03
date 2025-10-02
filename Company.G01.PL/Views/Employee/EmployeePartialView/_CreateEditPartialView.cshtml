@@ -5,7 +5,7 @@
 @{
     _departmentRepo.GetAll();
     // var Departments = new SelectList(ViewData["departments"] as IEnumerable<Department>,"Id" , "Name");
-    var Departments = new SelectList(_departmentRepo.GetAll(), "Id", "Name");
+    var departments = new SelectList(_departmentRepo.GetAll(), "Id", "Name");
 }
 
 <div class="my-3">
@@ -55,7 +55,7 @@
 </div>
 <div class="my-3">
     <label asp-for="DepartmentId" class="col-form-label"></label>
-    <select asp-for="DepartmentId" asp-items="Departments" class="form-control">
+    <select asp-for="DepartmentId" asp-items="departments" class="form-control">
        <option value="@null">-- Select Department --</option>
     </select>
 </div>
